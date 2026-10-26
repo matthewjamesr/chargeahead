@@ -293,8 +293,8 @@ tailwind.config = { theme: { extend: {
       <div class="tab-panel hidden" data-panel="limitations">
         <ul class="list-disc ml-5 space-y-2 text-zinc-300 text-[15px] leading-relaxed">
           <li><strong class="text-white">Utilization is unobserved.</strong> No public dataset reports sessions/day per station; the model predicts where ports <em>are</em>, a proxy for where demand is — placement history and network strategy are baked into the target.</li>
-          <li><strong class="text-white">Supply features cut both ways.</strong> "Ports within 5 km" is the strongest predictor, so v2 is best read as an infill model. Greenfield discovery is a separate family, in development.</li>
-          <li><strong class="text-white">EV registration coverage is two states.</strong> CA/WA publish granular registration data; most states do not. Features are missing — honestly, as NaN — elsewhere.</li>
+          <li><strong class="text-white">Supply features cut both ways.</strong> "Ports within 5 km" is the strongest predictor, so the current model is best read as an infill model. Greenfield discovery is a separate family, in development.</li>
+          <li><strong class="text-white">EV registration coverage is six states, not fifty.</strong> CA, WA, NY, MD and PA publish ZIP-level counts (NY is battery-electric only); VA publishes only county-level counts through 2022 — too coarse and too old for M3's harmonized features, so VA is held out. Together the six cover about 40% of tracts; ten other priority states were checked and publish nothing at sub-state geography. The features are missing — honestly, as NaN — elsewhere.</li>
           <li><strong class="text-white">ZIP→tract allocation is approximate.</strong> Areal interpolation assumes demand follows population density within a ZIP.</li>
           <li><strong class="text-white">A ranking is not a site.</strong> Grid capacity, land cost, permitting and equity constraints decide real placements; the model produces a shortlist for humans.</li>
         </ul>
