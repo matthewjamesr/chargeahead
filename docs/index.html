@@ -509,7 +509,7 @@ function render(){
   filtered=CANDS.filter(c=>(!st||c.state_name===st)&&c.predicted_dcfc>=min&&
     (!q||(c.county_name+' '+c.tract+' '+c.GEOID).toLowerCase().includes(q)));
   filtered.sort((a,b)=>(b[sort]??-1)-(a[sort]??-1));
-  document.getElementById('f-count').textContent=filtered.length+' tracts shown';
+  document.getElementById('f-count').textContent=filtered.length+' shown';
   const tb=document.getElementById('cand-body');tb.innerHTML='';
   Object.values(markers).forEach(m=>map.removeLayer(m));markers={};
   Object.values(polys).forEach(m=>map.removeLayer(m));polys={};
