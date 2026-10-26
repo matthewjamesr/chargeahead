@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""M3_draft3 — three targeted tests on top of draft2's hurdle model:
+"""M3 (release build) — three targeted tests on top of draft2's hurdle model:
 
   C1  LODES-only employment: drop the ZBP jobs feature (log_jobs) that
       duplicates LODES workplace counts; establishments (business
