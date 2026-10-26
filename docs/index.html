@@ -4,7 +4,34 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ChargeAhead — Open models for EV charging placement</title>
-<meta name="description" content="Open, data-driven models for deciding where EV charging should go next. Tract-level DC fast-charging demand prediction built entirely on public data.">
+<meta name="description" content="Open, data-driven models for deciding where EV charging should go next. Tract-level DC fast-charging demand prediction for all 85,186 U.S. census tracts, built entirely on public data.">
+<meta name="keywords" content="EV charging placement, DC fast charging, DCFC siting, electric vehicle infrastructure, census tract model, gradient boosting, hurdle model, open data, OpenStreetMap, LODES, AADT, ChargeAhead">
+<meta name="author" content="Matthew Reichardt">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#09090b">
+<link rel="canonical" href="https://www.matthewreichardt.com/chargeahead/">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ChargeAhead">
+<meta property="og:title" content="ChargeAhead — Open models for EV charging placement">
+<meta property="og:description" content="Tract-level DC fast-charging demand prediction for all 85,186 U.S. census tracts, built entirely on public data. Current model M3: spatial-CV R² 0.335.">
+<meta property="og:url" content="https://www.matthewreichardt.com/chargeahead/">
+<meta property="og:image" content="https://www.matthewreichardt.com/chargeahead/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ChargeAhead — Open models for EV charging placement">
+<meta name="twitter:description" content="Tract-level DC fast-charging demand prediction for all 85,186 U.S. census tracts, built entirely on public data. Current model M3: spatial-CV R² 0.335.">
+<meta name="twitter:image" content="https://www.matthewreichardt.com/chargeahead/og-image.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"WebSite","name":"ChargeAhead","url":"https://www.matthewreichardt.com/chargeahead/","description":"Open, data-driven models for deciding where EV charging should go next."},
+ {"@type":"Dataset","name":"ChargeAhead tract-level DC fast-charging candidate rankings (model M3)","description":"Predicted DC fast-charge ports for U.S. census tracts with no existing DC fast charging, from a two-stage hurdle gradient-boosting model trained on public data (NLR station census, Census ACS/LODES, state EV registrations, FHWA HPMS traffic counts, OpenStreetMap).","url":"https://www.matthewreichardt.com/chargeahead/","license":"https://opensource.org/licenses/MIT","creator":{"@type":"Person","name":"Matthew Reichardt"},"distribution":[{"@type":"DataDownload","encodingFormat":"text/csv","contentUrl":"https://github.com/matthewjamesr/chargeahead/blob/main/results/candidate_tracts_dcfc_m3_top500.csv"},{"@type":"DataDownload","encodingFormat":"application/octet-stream","contentUrl":"https://github.com/matthewjamesr/chargeahead/blob/main/models/m3_hurdle.joblib"}]}
+]}
+</script>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -19,16 +46,44 @@ tailwind.config = { theme: { extend: {
   html{scroll-behavior:smooth}
   body{background:#09090b;color:#e4e4e7;font-family:Inter,ui-sans-serif,system-ui}
   ::selection{background:#a3e635;color:#09090b}
-  .card{background:rgba(24,24,27,.72);border:1px solid #27272a;border-radius:.9rem;backdrop-filter:blur(8px)}
+  .card{background:rgba(24,24,27,.72);border:1px solid #27272a;border-radius:.75rem;box-shadow:0 1px 2px rgba(0,0,0,.4);backdrop-filter:blur(8px)}
   .card:hover{border-color:#3f3f46}
-  .badge{display:inline-flex;align-items:center;gap:.35rem;border:1px solid #3f3f46;border-radius:999px;padding:.15rem .6rem;font-size:.72rem;font-weight:600;letter-spacing:.02em;color:#d4d4d8;background:rgba(39,39,42,.6)}
-  .dt-badge{display:inline-flex;align-items:center;border:1px solid #3f3f46;border-radius:999px;padding:.1rem .55rem;font-size:.7rem;font-weight:500;color:#d4d4d8;background:rgba(39,39,42,.5);white-space:nowrap}
+  /* shadcn Badge */
+  .badge{display:inline-flex;align-items:center;gap:.35rem;border:1px solid #3f3f46;border-radius:.375rem;padding:.125rem .625rem;font-size:.75rem;font-weight:600;letter-spacing:.02em;color:#d4d4d8;background:rgba(39,39,42,.6)}
+  .dt-badge{display:inline-flex;align-items:center;border:1px solid #3f3f46;border-radius:.375rem;padding:.125rem .55rem;font-size:.7rem;font-weight:500;color:#d4d4d8;background:rgba(39,39,42,.5);white-space:nowrap}
   .badge-volt{border-color:#a3e635;color:#a3e635;background:rgba(163,230,53,.08)}
-  .btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:.6rem;font-weight:600;font-size:.9rem;padding:.65rem 1.15rem;transition:all .15s}
-  .btn-primary{background:#a3e635;color:#09090b}.btn-primary:hover{background:#bef264}
-  .btn-outline{border:1px solid #3f3f46;color:#e4e4e7;background:rgba(24,24,27,.5)}.btn-outline:hover{border-color:#a3e635;color:#a3e635}
-  .tab-btn{border:1px solid #3f3f46;border-radius:.55rem;padding:.45rem .95rem;font-size:.85rem;font-weight:600;color:#a1a1aa;background:rgba(24,24,27,.5)}
-  .tab-btn.active{background:#a3e635;color:#09090b;border-color:#a3e635}
+  /* shadcn Button */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:.375rem;font-weight:500;font-size:.875rem;line-height:1.25rem;padding:.5rem 1rem;transition:background-color .15s,color .15s,border-color .15s;white-space:nowrap}
+  .btn:focus-visible{outline:none;box-shadow:0 0 0 2px #09090b,0 0 0 4px #a3e635}
+  .btn-primary{background:#a3e635;color:#09090b}.btn-primary:hover{background:#b7ec55}
+  .btn-outline{border:1px solid #27272a;color:#e4e4e7;background:transparent}.btn-outline:hover{background:#27272a;color:#fafafa}
+  /* shadcn Tabs */
+  #method-tabs{display:inline-flex;align-items:center;gap:.25rem;background:#18181b;border-radius:.5rem;padding:.25rem}
+  .tab-btn{border:0;border-radius:.375rem;padding:.375rem .75rem;font-size:.875rem;font-weight:500;color:#a1a1aa;background:transparent;transition:all .15s;cursor:pointer}
+  .tab-btn.active{background:#09090b;color:#fafafa;box-shadow:0 1px 2px rgba(0,0,0,.4)}
+  /* shadcn Select */
+  .sc-native{display:none!important}
+  .sc-wrap{position:relative;display:inline-block}
+  .sc-trigger{display:flex;height:2.25rem;align-items:center;justify-content:space-between;gap:.5rem;border-radius:.375rem;border:1px solid #27272a;background:#09090b;padding:.5rem .75rem;font-size:.875rem;color:#e4e4e7;box-shadow:0 1px 2px rgba(0,0,0,.3);cursor:pointer;min-width:9rem}
+  .sc-trigger:focus-visible{outline:none;box-shadow:0 0 0 2px #09090b,0 0 0 4px #a3e635}
+  .sc-trigger svg{opacity:.5;flex:none;transition:transform .15s}
+  .sc-trigger[aria-expanded="true"] svg{transform:rotate(180deg)}
+  .sc-content{position:absolute;top:calc(100% + .25rem);left:0;z-index:50;min-width:100%;max-height:18rem;overflow-y:auto;border-radius:.375rem;border:1px solid #27272a;background:#18181b;color:#e4e4e7;box-shadow:0 10px 24px rgba(0,0,0,.5);padding:.25rem;animation:sc-in .14s ease}
+  @keyframes sc-in{from{opacity:0;transform:scale(.97) translateY(-2px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  .sc-item{position:relative;display:flex;width:100%;align-items:center;border-radius:.25rem;padding:.375rem 2rem .375rem .5rem;font-size:.875rem;cursor:pointer;user-select:none;white-space:nowrap}
+  .sc-item[data-hl="1"]{background:#27272a}
+  .sc-item .sc-check{position:absolute;right:.5rem;display:none}
+  .sc-item[aria-selected="true"] .sc-check{display:block}
+  /* shadcn Checkbox */
+  .sc-checkbox{display:inline-flex;width:1rem;height:1rem;flex:none;align-items:center;justify-content:center;border-radius:.25rem;border:1px solid #52525b;background:transparent;cursor:pointer;vertical-align:-0.15rem}
+  .sc-checkbox[data-state="checked"]{background:#a3e635;border-color:#a3e635;color:#09090b}
+  .sc-checkbox:focus-visible{outline:none;box-shadow:0 0 0 2px #09090b,0 0 0 4px #a3e635}
+  /* shadcn Slider */
+  .sc-slider{position:relative;display:inline-flex;align-items:center;height:1.25rem;width:9rem;cursor:pointer;touch-action:none}
+  .sc-slider .sc-track{position:relative;height:.375rem;width:100%;border-radius:999px;background:#27272a;overflow:hidden}
+  .sc-slider .sc-range{position:absolute;height:100%;background:#a3e635;border-radius:999px}
+  .sc-thumb{position:absolute;width:1rem;height:1rem;border-radius:999px;background:#fafafa;border:2px solid #a3e635;box-shadow:0 1px 2px rgba(0,0,0,.4);transform:translateX(-50%);cursor:grab}
+  .sc-thumb:focus-visible{outline:none;box-shadow:0 0 0 2px #09090b,0 0 0 4px #a3e635}
   .bar-track{background:#27272a;border-radius:999px;height:.65rem;overflow:hidden}
   .bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#65a30d,#a3e635);width:0;transition:width 1.1s cubic-bezier(.22,1,.36,1)}
   .bar-fill.dim{background:linear-gradient(90deg,#3f3f46,#52525b)}
@@ -36,9 +91,10 @@ tailwind.config = { theme: { extend: {
   table.explorer td{padding:.55rem .7rem;border-bottom:1px solid #1c1c1f;font-size:.85rem;white-space:nowrap}
   table.explorer tr.row:hover td{background:rgba(163,230,53,.05)}
   table.explorer tr.sel td{background:rgba(163,230,53,.12)}
-  input[type=range]{accent-color:#a3e635}
-  select,input[type=text]{background:#18181b;border:1px solid #3f3f46;border-radius:.55rem;padding:.5rem .7rem;font-size:.85rem;color:#e4e4e7}
-  select:focus,input[type=text]:focus{outline:none;border-color:#a3e635}
+  /* shadcn Input */
+  input[type=text]{display:flex;height:2.25rem;background:#09090b;border:1px solid #27272a;border-radius:.375rem;padding:.5rem .75rem;font-size:.875rem;color:#e4e4e7;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+  input[type=text]::placeholder{color:#71717a}
+  input[type=text]:focus{outline:none;border-color:#a3e635;box-shadow:0 0 0 2px rgba(163,230,53,.25)}
   .leaflet-container{background:#0c0c0e;font-family:Inter}
   .glow{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:-1}
   .fade-up{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s ease}
@@ -192,7 +248,7 @@ tailwind.config = { theme: { extend: {
   <!-- METHODS -->
   <section id="methods" class="py-14">
     <h2 class="font-disp text-3xl font-bold fade-up">Methods, in the open</h2>
-    <div class="flex flex-wrap gap-2 mt-6 fade-up" id="method-tabs">
+    <div class="mt-6 fade-up" id="method-tabs">
       <button class="tab-btn active" data-tab="pipeline">Pipeline</button>
       <button class="tab-btn" data-tab="features">Features</button>
       <button class="tab-btn" data-tab="validation">Validation</button>
@@ -470,6 +526,151 @@ function select(c,fly){
 }
 ['f-state','f-search','f-min','f-sort','f-polys'].forEach(id=>document.getElementById(id).addEventListener('input',render));
 render();
+</script>
+<script>
+/* ---------- shadcn component kit (vanilla implementations of the
+   Radix-based shadcn/ui Select, Checkbox and Slider; the hidden native
+   elements remain the state + event source for the page's logic) ----- */
+(function(){
+  const CHEVRON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+  const CHECK = '<svg class="sc-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  function enhanceSelect(sel){
+    if (!sel || sel.dataset.scDone) return; sel.dataset.scDone = 1;
+    sel.classList.add('sc-native'); sel.tabIndex = -1;
+    const wrap = document.createElement('span'); wrap.className = 'sc-wrap';
+    sel.parentNode.insertBefore(wrap, sel); wrap.appendChild(sel);
+    const trigger = document.createElement('button');
+    trigger.type = 'button'; trigger.className = 'sc-trigger';
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.innerHTML = '<span class="sc-label"></span>' + CHEVRON;
+    wrap.appendChild(trigger);
+    const content = document.createElement('div');
+    content.className = 'sc-content'; content.setAttribute('role', 'listbox');
+    content.hidden = true; wrap.appendChild(content);
+    const label = trigger.querySelector('.sc-label');
+    let hl = -1, open = false;
+    function syncLabel(){ const o = sel.options[sel.selectedIndex]; label.textContent = o ? o.textContent : ''; }
+    function build(){
+      content.innerHTML = '';
+      Array.from(sel.options).forEach((o, i) => {
+        const it = document.createElement('div');
+        it.className = 'sc-item'; it.setAttribute('role', 'option');
+        it.setAttribute('aria-selected', i === sel.selectedIndex ? 'true' : 'false');
+        it.innerHTML = '<span></span>' + CHECK;
+        it.querySelector('span').textContent = o.textContent;
+        it.addEventListener('click', () => { pick(i); });
+        it.addEventListener('mousemove', () => setHl(i));
+        content.appendChild(it);
+      });
+      hl = sel.selectedIndex;
+      paint();
+    }
+    function paint(){
+      Array.from(content.children).forEach((it, i) => it.dataset.hl = i === hl ? '1' : '0');
+      const it = content.children[hl];
+      if (it) it.scrollIntoView({block: 'nearest'});
+    }
+    function setHl(i){ hl = i; paint(); }
+    function show(){ build(); open = true; content.hidden = false; trigger.setAttribute('aria-expanded', 'true'); }
+    function hide(){ open = false; content.hidden = true; trigger.setAttribute('aria-expanded', 'false'); }
+    function pick(i){
+      if (i !== sel.selectedIndex){
+        sel.selectedIndex = i;
+        sel.dispatchEvent(new Event('change', {bubbles: true}));
+      }
+      syncLabel(); hide(); trigger.focus();
+    }
+    trigger.addEventListener('click', () => open ? hide() : show());
+    trigger.addEventListener('keydown', e => {
+      if (!open && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); show(); return; }
+      if (!open) return;
+      if (e.key === 'ArrowDown'){ e.preventDefault(); setHl(Math.min(hl + 1, sel.options.length - 1)); }
+      else if (e.key === 'ArrowUp'){ e.preventDefault(); setHl(Math.max(hl - 1, 0)); }
+      else if (e.key === 'Home'){ e.preventDefault(); setHl(0); }
+      else if (e.key === 'End'){ e.preventDefault(); setHl(sel.options.length - 1); }
+      else if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); pick(hl); }
+      else if (e.key === 'Escape'){ e.preventDefault(); hide(); }
+      else if (e.key === 'Tab'){ hide(); }
+      else if (e.key.length === 1){
+        const k = e.key.toLowerCase();
+        const idx = Array.from(sel.options).findIndex(o => o.textContent.toLowerCase().startsWith(k));
+        if (idx >= 0) setHl(idx);
+      }
+    });
+    document.addEventListener('click', e => { if (open && !wrap.contains(e.target)) hide(); });
+    sel.addEventListener('change', syncLabel);
+    syncLabel();
+  }
+  function enhanceCheckbox(box){
+    if (!box || box.dataset.scDone) return; box.dataset.scDone = 1;
+    box.classList.add('sc-native');
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'sc-checkbox'; btn.setAttribute('role', 'checkbox');
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+    box.parentNode.insertBefore(btn, box);
+    function paint(){
+      btn.dataset.state = box.checked ? 'checked' : 'unchecked';
+      btn.setAttribute('aria-checked', box.checked ? 'true' : 'false');
+      btn.querySelector('svg').style.opacity = box.checked ? '1' : '0';
+    }
+    btn.addEventListener('click', e => {
+      e.preventDefault(); e.stopPropagation();
+      box.checked = !box.checked;
+      box.dispatchEvent(new Event('change', {bubbles: true}));
+      paint();
+    });
+    box.addEventListener('change', paint);
+    paint();
+  }
+  function enhanceRange(inp){
+    if (!inp || inp.dataset.scDone) return; inp.dataset.scDone = 1;
+    inp.classList.add('sc-native');
+    const s = document.createElement('span'); s.className = 'sc-slider';
+    s.innerHTML = '<span class="sc-track"><span class="sc-range"></span></span><span class="sc-thumb" tabindex="0" role="slider" aria-label="Minimum predicted ports"></span>';
+    inp.parentNode.insertBefore(s, inp);
+    const range = s.querySelector('.sc-range'), thumb = s.querySelector('.sc-thumb');
+    const min = parseFloat(inp.min), max = parseFloat(inp.max), step = parseFloat(inp.step) || 1;
+    function paint(){
+      const pct = (parseFloat(inp.value) - min) / (max - min) * 100;
+      range.style.width = pct + '%'; thumb.style.left = pct + '%';
+      thumb.setAttribute('aria-valuenow', inp.value);
+    }
+    function setFromEvent(e){
+      const r = s.getBoundingClientRect();
+      let v = min + (e.clientX - r.left) / r.width * (max - min);
+      v = Math.round(v / step) * step;
+      v = Math.max(min, Math.min(max, v));
+      if (String(v) !== inp.value){ inp.value = v; inp.dispatchEvent(new Event('input', {bubbles: true})); }
+      paint();
+    }
+    s.addEventListener('pointerdown', e => {
+      s.setPointerCapture(e.pointerId); setFromEvent(e);
+      const mv = ev => setFromEvent(ev);
+      s.addEventListener('pointermove', mv);
+      s.addEventListener('pointerup', () => s.removeEventListener('pointermove', mv), {once: true});
+    });
+    thumb.addEventListener('keydown', e => {
+      let v = parseFloat(inp.value);
+      if (e.key === 'ArrowRight' || e.key === 'ArrowUp') v += step;
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') v -= step;
+      else if (e.key === 'Home') v = min;
+      else if (e.key === 'End') v = max;
+      else return;
+      e.preventDefault();
+      inp.value = Math.max(min, Math.min(max, v));
+      inp.dispatchEvent(new Event('input', {bubbles: true}));
+      paint();
+    });
+    inp.addEventListener('input', paint);
+    paint();
+  }
+  enhanceSelect(document.getElementById('dt-type'));
+  enhanceSelect(document.getElementById('f-state'));
+  enhanceSelect(document.getElementById('f-sort'));
+  enhanceCheckbox(document.getElementById('f-polys'));
+  enhanceRange(document.getElementById('f-min'));
+})();
 </script>
 </body>
 </html>
