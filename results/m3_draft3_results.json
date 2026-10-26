@@ -1,0 +1,28 @@
+{
+ "C0_draft2_full": {
+  "r2": 0.2881,
+  "mae": 1.2353,
+  "n_features": 25
+ },
+ "C1_lodes_only_emp": {
+  "r2": 0.2884,
+  "mae": 1.2353,
+  "n_features": 24
+ },
+ "C2_harmonized_regs": {
+  "r2": 0.2889,
+  "mae": 1.234,
+  "n_features": 25
+ },
+ "C3_plus_aadt": {
+  "r2": 0.2915,
+  "mae": 1.2349,
+  "n_features": 27
+ },
+ "C4_plus_osm_poi": {
+  "r2": 0.3353,
+  "mae": 1.169,
+  "n_features": 33
+ },
+ "best_variant": "C4_plus_osm_poi"
+}
