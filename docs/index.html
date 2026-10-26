@@ -74,6 +74,12 @@ tailwind.config = { theme: { extend: {
   .sc-item[data-hl="1"]{background:#27272a}
   .sc-item .sc-check{position:absolute;right:.5rem;display:none}
   .sc-item[aria-selected="true"] .sc-check{display:block}
+  /* shadcn icon Button (ghost) + explorer reset visibility */
+  .sc-icon-btn{display:inline-flex;width:2.25rem;height:2.25rem;flex:none;align-items:center;justify-content:center;border-radius:.375rem;color:#a1a1aa;background:transparent;transition:background-color .15s,color .15s,opacity .18s,transform .18s;cursor:pointer}
+  .sc-icon-btn:hover{background:#27272a;color:#fafafa}
+  .sc-icon-btn:focus-visible{outline:none;box-shadow:0 0 0 2px #09090b,0 0 0 4px #a3e635}
+  .f-reset{opacity:0;pointer-events:none;transform:scale(.85)}
+  .f-reset.show{opacity:1;pointer-events:auto;transform:scale(1)}
   /* shadcn Checkbox */
   .sc-checkbox{display:inline-flex;width:1rem;height:1rem;flex:none;align-items:center;justify-content:center;border-radius:.25rem;border:1px solid #52525b;background:transparent;cursor:pointer;vertical-align:-0.15rem}
   .sc-checkbox[data-state="checked"]{background:#a3e635;border-color:#a3e635;color:#09090b}
@@ -226,7 +232,12 @@ tailwind.config = { theme: { extend: {
         </select>
         <label class="text-sm text-zinc-400 flex items-center gap-2">
           <input type="checkbox" id="f-polys" checked class="accent-lime-400 w-4 h-4"> Tract boundaries</label>
-        <span class="badge ml-auto" id="f-count"></span>
+        <span class="ml-auto flex items-center gap-2">
+          <span class="badge" id="f-count"></span>
+          <button type="button" id="f-reset" class="sc-icon-btn f-reset" title="Reset filters and map view" aria-label="Reset filters and map view">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          </button>
+        </span>
       </div>
       <div id="map" class="w-full h-[430px] rounded-lg mt-4 border border-zinc-800 z-0"></div>
       <div class="overflow-x-auto mt-4 max-h-[430px] overflow-y-auto">
@@ -526,6 +537,38 @@ function select(c,fly){
 }
 ['f-state','f-search','f-min','f-sort','f-polys'].forEach(id=>document.getElementById(id).addEventListener('input',render));
 render();
+
+/* ---------- explorer reset (appears when filters or map view differ from start) ---------- */
+const HOME={center:[37.5,-96],zoom:4};
+const FILTER_DEFAULTS={'f-state':'','f-search':'','f-min':'0','f-sort':'predicted_dcfc'};
+const resetBtn=document.getElementById('f-reset');
+function filtersDirty(){
+  for(const id in FILTER_DEFAULTS) if(document.getElementById(id).value!==FILTER_DEFAULTS[id])return true;
+  return !document.getElementById('f-polys').checked;
+}
+function mapDirty(){
+  const c=map.getCenter();
+  return map.getZoom()!==HOME.zoom||Math.abs(c.lat-HOME.center[0])>1e-6||Math.abs(c.lng-HOME.center[1])>1e-6;
+}
+function updateReset(){resetBtn.classList.toggle('show',filtersDirty()||mapDirty());}
+['f-state','f-search','f-min','f-sort','f-polys'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('input',updateReset);el.addEventListener('change',updateReset);
+});
+map.on('moveend',updateReset);
+resetBtn.addEventListener('click',()=>{
+  for(const id in FILTER_DEFAULTS){
+    const el=document.getElementById(id);el.value=FILTER_DEFAULTS[id];
+    el.dispatchEvent(new Event('input',{bubbles:true}));
+    el.dispatchEvent(new Event('change',{bubbles:true}));
+  }
+  const polysEl=document.getElementById('f-polys');
+  if(!polysEl.checked){polysEl.checked=true;polysEl.dispatchEvent(new Event('input',{bubbles:true}));polysEl.dispatchEvent(new Event('change',{bubbles:true}));}
+  map.closePopup();
+  map.flyTo(HOME.center,HOME.zoom,{duration:.8});
+  updateReset();
+});
+updateReset();
 </script>
 <script>
 /* ---------- shadcn component kit (vanilla implementations of the
@@ -577,6 +620,7 @@ render();
     function pick(i){
       if (i !== sel.selectedIndex){
         sel.selectedIndex = i;
+        sel.dispatchEvent(new Event('input', {bubbles: true}));
         sel.dispatchEvent(new Event('change', {bubbles: true}));
       }
       syncLabel(); hide(); trigger.focus();
@@ -617,6 +661,7 @@ render();
     btn.addEventListener('click', e => {
       e.preventDefault(); e.stopPropagation();
       box.checked = !box.checked;
+      box.dispatchEvent(new Event('input', {bubbles: true}));
       box.dispatchEvent(new Event('change', {bubbles: true}));
       paint();
     });
