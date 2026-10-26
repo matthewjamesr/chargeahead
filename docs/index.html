@@ -85,7 +85,11 @@ tailwind.config = { theme: { extend: {
   .sc-checkbox[data-state="checked"]{background:#a3e635;border-color:#a3e635;color:#09090b}
   .sc-checkbox:focus-visible{outline:none;box-shadow:0 0 0 2px #09090b,0 0 0 4px #a3e635}
   /* shadcn Slider */
-  .sc-slider{position:relative;display:inline-flex;align-items:center;height:1.25rem;width:9rem;margin-left:.75rem;cursor:pointer;touch-action:none}
+  .sc-slider{position:relative;display:inline-flex;align-items:center;height:1.25rem;width:6.5rem;margin-left:.75rem;cursor:pointer;touch-action:none}
+  .sc-wrap:has(>#f-state){width:10rem;flex:none}
+  .sc-wrap:has(>#f-sort){width:13.5rem;flex:none}
+  .sc-trigger{width:100%}
+  .sc-trigger .sc-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .sc-slider .sc-track{position:relative;height:.375rem;width:100%;border-radius:999px;background:#27272a;overflow:hidden}
   .sc-slider .sc-range{position:absolute;height:100%;background:#a3e635;border-radius:999px}
   .sc-thumb{position:absolute;width:1rem;height:1rem;border-radius:999px;background:#fafafa;border:2px solid #a3e635;box-shadow:0 1px 2px rgba(0,0,0,.4);transform:translateX(-50%);cursor:grab}
@@ -217,9 +221,9 @@ tailwind.config = { theme: { extend: {
     <h2 class="font-disp text-3xl font-bold fade-up">Candidate explorer</h2>
     <p class="text-zinc-400 mt-2 max-w-3xl fade-up">The top 250 census tracts that have <strong class="text-zinc-200">zero DC fast chargers today</strong>, ranked by predicted ports. Filter, search, sort — click a row or a marker and the map and table stay in sync.</p>
     <div class="card p-4 mt-8 fade-up">
-      <div class="flex flex-wrap gap-3 items-center">
+      <div class="flex flex-wrap xl:flex-nowrap gap-3 items-center">
         <select id="f-state"><option value="">All states</option></select>
-        <input type="text" id="f-search" placeholder="Search county or tract…" class="w-52">
+        <input type="text" id="f-search" placeholder="Search county or tract…" class="w-44">
         <label class="text-sm text-zinc-400 flex items-center gap-2">Min predicted ports
           <input type="range" id="f-min" min="0" max="15" step="0.5" value="0" class="w-36">
           <span id="f-min-val" class="num text-zinc-200 w-8">0</span></label>
@@ -230,8 +234,8 @@ tailwind.config = { theme: { extend: {
           <option value="jobs">Sort: jobs</option>
           <option value="dist_nearest_dcfc_km">Sort: distance to nearest DCFC</option>
         </select>
-        <label class="text-sm text-zinc-400 flex items-center gap-2">
-          <input type="checkbox" id="f-polys" checked class="accent-lime-400 w-4 h-4"> Tract boundaries</label>
+        <div class="text-sm text-zinc-400 flex items-center gap-2">
+          <input type="checkbox" id="f-polys" checked class="accent-lime-400 w-4 h-4"> <span data-check-text class="cursor-pointer select-none">Tract boundaries</span></div>
         <span class="ml-auto flex items-center gap-2">
           <span class="badge" id="f-count"></span>
           <button type="button" id="f-reset" class="sc-icon-btn f-reset" title="Reset filters and map view" aria-label="Reset filters and map view">
@@ -665,6 +669,8 @@ updateReset();
       box.dispatchEvent(new Event('change', {bubbles: true}));
       paint();
     });
+    const txt = box.parentElement ? box.parentElement.querySelector('[data-check-text]') : null;
+    if (txt) txt.addEventListener('click', () => btn.click());
     box.addEventListener('change', paint);
     paint();
   }
