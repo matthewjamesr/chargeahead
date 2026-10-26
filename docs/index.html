@@ -22,6 +22,7 @@ tailwind.config = { theme: { extend: {
   .card{background:rgba(24,24,27,.72);border:1px solid #27272a;border-radius:.9rem;backdrop-filter:blur(8px)}
   .card:hover{border-color:#3f3f46}
   .badge{display:inline-flex;align-items:center;gap:.35rem;border:1px solid #3f3f46;border-radius:999px;padding:.15rem .6rem;font-size:.72rem;font-weight:600;letter-spacing:.02em;color:#d4d4d8;background:rgba(39,39,42,.6)}
+  .dt-badge{display:inline-flex;align-items:center;border:1px solid #3f3f46;border-radius:999px;padding:.1rem .55rem;font-size:.7rem;font-weight:500;color:#d4d4d8;background:rgba(39,39,42,.5);white-space:nowrap}
   .badge-volt{border-color:#a3e635;color:#a3e635;background:rgba(163,230,53,.08)}
   .btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:.6rem;font-weight:600;font-size:.9rem;padding:.65rem 1.15rem;transition:all .15s}
   .btn-primary{background:#a3e635;color:#09090b}.btn-primary:hover{background:#bef264}
@@ -257,26 +258,71 @@ tailwind.config = { theme: { extend: {
   <!-- DATA -->
   <section id="data" class="py-14">
     <h2 class="font-disp text-3xl font-bold fade-up">Data sources — all public</h2>
-    <div class="card mt-8 overflow-x-auto fade-up">
-      <table class="explorer w-full">
-        <thead><tr><th>Dataset</th><th>Publisher</th><th>Used for</th><th>Access</th></tr></thead>
+    <div class="card mt-8 fade-up">
+      <div class="flex flex-wrap items-center gap-3 p-4 border-b border-zinc-800">
+        <div class="relative">
+          <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="dt-search" type="text" placeholder="Search datasets…" autocomplete="off"
+            class="h-9 w-64 rounded-md border border-zinc-800 bg-zinc-950 pl-9 pr-3 text-sm text-zinc-200 placeholder:text-zinc-500 outline-none focus:border-lime-400/60 focus:ring-2 focus:ring-lime-400/20 transition">
+        </div>
+        <select id="dt-type" class="h-9 rounded-md border border-zinc-800 bg-zinc-950 px-2.5 text-sm text-zinc-200 outline-none focus:border-lime-400/60 focus:ring-2 focus:ring-lime-400/20 transition cursor-pointer">
+          <option value="">All data types</option>
+          <option value="stations">Stations</option>
+          <option value="demographics">Demographics</option>
+          <option value="geography">Geography</option>
+          <option value="employment">Employment</option>
+          <option value="registrations">Registrations</option>
+          <option value="traffic">Traffic</option>
+          <option value="landuse">Land use</option>
+        </select>
+        <span id="dt-count" class="ml-auto text-xs text-zinc-500 font-mono"></span>
+      </div>
+      <div class="overflow-x-auto">
+      <table class="explorer w-full" id="dt-table">
+        <thead><tr><th>Dataset</th><th>Publisher</th><th>Type</th><th>Used for</th><th>Vintage</th><th>Access</th></tr></thead>
         <tbody class="text-zinc-300">
-          <tr><td>Alternative Fuel Stations</td><td>NLR (formerly NREL), U.S. DOE</td><td>Station census, port counts, target</td><td><a class="text-volt hover:underline" href="https://developer.nlr.gov/docs/transportation/alt-fuel-stations-v1/" target="_blank" rel="noopener">Free API key</a></td></tr>
-          <tr><td>ACS 2023 5-year estimates</td><td>U.S. Census Bureau</td><td>Population, median income by tract</td><td><a class="text-volt hover:underline" href="https://www.census.gov/programs-surveys/acs" target="_blank" rel="noopener">Open</a></td></tr>
-          <tr><td>TIGER/Line shapefiles 2023</td><td>U.S. Census Bureau</td><td>Tract &amp; ZCTA boundaries, primary roads</td><td><a class="text-volt hover:underline" href="https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html" target="_blank" rel="noopener">Open</a></td></tr>
-          <tr><td>ZIP Business Patterns 2022</td><td>U.S. Census Bureau</td><td>Establishments by ZIP</td><td><a class="text-volt hover:underline" href="https://www.census.gov/programs-surveys/cbp.html" target="_blank" rel="noopener">Open</a></td></tr>
-          <tr><td>LODES8 2023 (LEHD Origin-Destination Employment Statistics)</td><td>U.S. Census Bureau</td><td>Workplace jobs &amp; resident workers by tract</td><td><a class="text-volt hover:underline" href="https://lehd.ces.census.gov/data/lodes/" target="_blank" rel="noopener">Open</a></td></tr>
-          <tr><td>Electric Vehicle Population Data</td><td>Washington State DOL</td><td>EV registrations by ZIP (WA)</td><td><a class="text-volt hover:underline" href="https://data.wa.gov/Transportation/Electric-Vehicle-Population-Data/f6w7-q2d2" target="_blank" rel="noopener">Open</a></td></tr>
-          <tr><td>Vehicle Fuel Type Count by ZIP</td><td>California DMV</td><td>EV registrations by ZIP (CA)</td><td><a class="text-volt hover:underline" href="https://data.ca.gov/dataset/vehicle-fuel-type-count-by-zip-code" target="_blank" rel="noopener">Open</a></td></tr>
-          <tr><td>Vehicle, Snowmobile and Boat Registrations</td><td>New York State (data.ny.gov)</td><td>EV registrations by ZIP (NY — battery-electric only)</td><td><a class="text-volt hover:underline" href="https://data.ny.gov/d/w4pv-hbkt" target="_blank" rel="noopener">Open</a></td></tr>
-          <tr><td>Electric and Plug-in Hybrid Vehicle Registrations</td><td>Maryland DOT MVA (opendata.maryland.gov)</td><td>EV registrations by ZIP (MD)</td><td><a class="text-volt hover:underline" href="https://opendata.maryland.gov/d/tugr-unu9" target="_blank" rel="noopener">Open</a></td></tr>
-          <tr><td>EV Registrations by ZIP (ArcGIS service)</td><td>PennDOT</td><td>EV registrations by ZIP (PA)</td><td><a class="text-volt hover:underline" href="https://gis.penndot.pa.gov/gis/rest/services/opendata/evregistrationszip/MapServer" target="_blank" rel="noopener">Open</a></td></tr>
-          <tr><td>EV Registrations by Jurisdiction, 2008–2022</td><td>Virginia Open Data (U.S. DOE-sourced)</td><td>EV registrations by county (VA — held out of M3's harmonized features: county grain, 2022 vintage)</td><td><a class="text-volt hover:underline" href="https://data.virginia.gov/dataset/virginia-electric-vehicle-ev" target="_blank" rel="noopener">Open</a></td></tr>
-          <tr><td>HPMS Spatial All Sections 2024</td><td>FHWA (datahub.transportation.gov)</td><td>Arterial traffic counts (AADT) by county</td><td><a class="text-volt hover:underline" href="https://datahub.transportation.gov/d/42um-tgh5" target="_blank" rel="noopener">Open</a></td></tr>
-          <tr><td>OpenStreetMap extracts — us-west &amp; us-south</td><td>OpenStreetMap contributors, via Geofabrik</td><td>Points of interest by tract: fuel, parking, retail, lodging</td><td><a class="text-volt hover:underline" href="https://download.geofabrik.de/north-america.html" target="_blank" rel="noopener">Open</a></td></tr>
+          <tr data-type="stations"><td>Alternative Fuel Stations</td><td>NLR (formerly NREL), U.S. DOE</td><td><span class="dt-badge">Stations</span></td><td>Station census, port counts, target</td><td class="num text-zinc-400">Oct 2026 pull</td><td><a class="text-volt hover:underline" href="https://developer.nlr.gov/docs/transportation/alt-fuel-stations-v1/" target="_blank" rel="noopener">Free API key</a></td></tr>
+          <tr data-type="demographics"><td>ACS 5-year estimates</td><td>U.S. Census Bureau</td><td><span class="dt-badge">Demographics</span></td><td>Population, median income by tract</td><td class="num text-zinc-400">2023 (2019–2023)</td><td><a class="text-volt hover:underline" href="https://www.census.gov/programs-surveys/acs" target="_blank" rel="noopener">Open</a></td></tr>
+          <tr data-type="geography"><td>TIGER/Line shapefiles</td><td>U.S. Census Bureau</td><td><span class="dt-badge">Geography</span></td><td>Tract &amp; ZCTA boundaries, primary roads</td><td class="num text-zinc-400">2023</td><td><a class="text-volt hover:underline" href="https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html" target="_blank" rel="noopener">Open</a></td></tr>
+          <tr data-type="employment"><td>ZIP Business Patterns</td><td>U.S. Census Bureau</td><td><span class="dt-badge">Employment</span></td><td>Establishments by ZIP</td><td class="num text-zinc-400">2022</td><td><a class="text-volt hover:underline" href="https://www.census.gov/programs-surveys/cbp.html" target="_blank" rel="noopener">Open</a></td></tr>
+          <tr data-type="employment"><td>LODES8 (LEHD Origin-Destination Employment Statistics)</td><td>U.S. Census Bureau</td><td><span class="dt-badge">Employment</span></td><td>Workplace jobs &amp; resident workers by tract</td><td class="num text-zinc-400">2023</td><td><a class="text-volt hover:underline" href="https://lehd.ces.census.gov/data/lodes/" target="_blank" rel="noopener">Open</a></td></tr>
+          <tr data-type="registrations"><td>Electric Vehicle Population Data</td><td>Washington State DOL</td><td><span class="dt-badge">Registrations</span></td><td>EV registrations by ZIP (WA)</td><td class="num text-zinc-400">Oct 2026 snapshot</td><td><a class="text-volt hover:underline" href="https://data.wa.gov/Transportation/Electric-Vehicle-Population-Data/f6w7-q2d2" target="_blank" rel="noopener">Open</a></td></tr>
+          <tr data-type="registrations"><td>Vehicle Fuel Type Count by ZIP</td><td>California DMV</td><td><span class="dt-badge">Registrations</span></td><td>EV registrations by ZIP (CA)</td><td class="num text-zinc-400">2025 counts (Jan 2026 file)</td><td><a class="text-volt hover:underline" href="https://data.ca.gov/dataset/vehicle-fuel-type-count-by-zip-code" target="_blank" rel="noopener">Open</a></td></tr>
+          <tr data-type="registrations"><td>Vehicle, Snowmobile and Boat Registrations</td><td>New York State (data.ny.gov)</td><td><span class="dt-badge">Registrations</span></td><td>EV registrations by ZIP (NY — battery-electric only)</td><td class="num text-zinc-400">Oct 2026 snapshot</td><td><a class="text-volt hover:underline" href="https://data.ny.gov/d/w4pv-hbkt" target="_blank" rel="noopener">Open</a></td></tr>
+          <tr data-type="registrations"><td>Electric and Plug-in Hybrid Vehicle Registrations</td><td>Maryland DOT MVA (opendata.maryland.gov)</td><td><span class="dt-badge">Registrations</span></td><td>EV registrations by ZIP (MD)</td><td class="num text-zinc-400">Aug 2026 (latest month)</td><td><a class="text-volt hover:underline" href="https://opendata.maryland.gov/d/tugr-unu9" target="_blank" rel="noopener">Open</a></td></tr>
+          <tr data-type="registrations"><td>EV Registrations by ZIP (ArcGIS service)</td><td>PennDOT</td><td><span class="dt-badge">Registrations</span></td><td>EV registrations by ZIP (PA)</td><td class="num text-zinc-400">2026 (latest quarter)</td><td><a class="text-volt hover:underline" href="https://gis.penndot.pa.gov/gis/rest/services/opendata/evregistrationszip/MapServer" target="_blank" rel="noopener">Open</a></td></tr>
+          <tr data-type="registrations"><td>EV Registrations by Jurisdiction</td><td>Virginia Open Data (U.S. DOE-sourced)</td><td><span class="dt-badge">Registrations</span></td><td>EV registrations by county (VA — held out of M3's harmonized features: county grain, older vintage)</td><td class="num text-zinc-400">2008–2022</td><td><a class="text-volt hover:underline" href="https://data.virginia.gov/dataset/virginia-electric-vehicle-ev" target="_blank" rel="noopener">Open</a></td></tr>
+          <tr data-type="traffic"><td>HPMS Spatial All Sections</td><td>FHWA (datahub.transportation.gov)</td><td><span class="dt-badge">Traffic</span></td><td>Arterial traffic counts (AADT) by county</td><td class="num text-zinc-400">2024 file (2023 AADT)</td><td><a class="text-volt hover:underline" href="https://datahub.transportation.gov/d/42um-tgh5" target="_blank" rel="noopener">Open</a></td></tr>
+          <tr data-type="landuse"><td>OpenStreetMap extracts — us-west &amp; us-south</td><td>OpenStreetMap contributors, via Geofabrik</td><td><span class="dt-badge">Land use</span></td><td>Points of interest by tract: fuel, parking, retail, lodging</td><td class="num text-zinc-400">Oct 25–26, 2026</td><td><a class="text-volt hover:underline" href="https://download.geofabrik.de/north-america.html" target="_blank" rel="noopener">Open</a></td></tr>
+          <tr id="dt-empty" class="hidden"><td colspan="6" class="text-center text-zinc-500 py-8">No datasets match your search.</td></tr>
         </tbody>
       </table>
+      </div>
     </div>
+    <script>
+    (function(){
+      const q = document.getElementById('dt-search'),
+            sel = document.getElementById('dt-type'),
+            rows = Array.from(document.querySelectorAll('#dt-table tbody tr[data-type]')),
+            empty = document.getElementById('dt-empty'),
+            count = document.getElementById('dt-count');
+      function apply(){
+        const text = q.value.trim().toLowerCase(), type = sel.value;
+        let shown = 0;
+        rows.forEach(r => {
+          const ok = (!type || r.dataset.type === type) &&
+                     (!text || r.textContent.toLowerCase().includes(text));
+          r.classList.toggle('hidden', !ok);
+          if (ok) shown++;
+        });
+        empty.classList.toggle('hidden', shown > 0);
+        count.textContent = shown + ' of ' + rows.length + ' datasets';
+      }
+      q.addEventListener('input', apply);
+      sel.addEventListener('change', apply);
+      apply();
+    })();
+    </script>
     <div class="card p-6 mt-4 fade-up flex flex-wrap items-center gap-4">
       <div>
         <h3 class="font-semibold text-lg">Reproduce it, fork it, beat it</h3>
