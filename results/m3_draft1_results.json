@@ -1,0 +1,28 @@
+{
+ "A0_m2_squared": {
+  "r2": 0.2094,
+  "mae": 1.3262
+ },
+ "A1_m2_poisson": {
+  "r2": -2.2487,
+  "mae": 1.3762
+ },
+ "A2_ext_squared": {
+  "r2": 0.235,
+  "mae": 1.3095
+ },
+ "A3_ext_poisson": {
+  "r2": -0.5081,
+  "mae": 1.3332
+ },
+ "A4_ext_hurdle_default": {
+  "r2": 0.2811,
+  "mae": 1.2606
+ },
+ "M3_draft1_hurdle_tuned": {
+  "r2": 0.2811,
+  "mae": 1.2606,
+  "clf": {},
+  "reg": {}
+ }
+}
