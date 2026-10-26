@@ -363,7 +363,8 @@ const CANDS=[{"GEOID": "06037300800", "state_name": "California", "county_name":
 const fmt=n=>n==null?'—':Math.round(n).toLocaleString();
 const money=n=>n==null?'—':'$'+Math.round(n).toLocaleString();
 const map=L.map('map',{scrollWheelZoom:false}).setView([37.5,-96],4);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap contributors © CARTO',maxZoom:18}).addTo(map);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'Esri, HERE, Garmin, OpenStreetMap contributors',maxZoom:16}).addTo(map);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',{maxZoom:16}).addTo(map);
 map.on('focus',()=>map.scrollWheelZoom.enable());map.on('blur',()=>map.scrollWheelZoom.disable());
 let markers={},filtered=CANDS.slice();
 
