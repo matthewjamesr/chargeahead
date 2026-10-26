@@ -90,7 +90,7 @@ tailwind.config = { theme: { extend: {
       <div class="card p-5 fade-up"><div class="num text-3xl md:text-4xl font-bold text-white"><span data-count="83546">0</span></div><div class="text-zinc-400 text-sm mt-1">public charging stations censused (NLR)</div></div>
       <div class="card p-5 fade-up"><div class="num text-3xl md:text-4xl font-bold text-white"><span data-count="79187">0</span></div><div class="text-zinc-400 text-sm mt-1">DC fast-charge ports in the census</div></div>
       <div class="card p-5 fade-up"><div class="num text-3xl md:text-4xl font-bold text-white"><span data-count="85186">0</span></div><div class="text-zinc-400 text-sm mt-1">census tracts scored by the model</div></div>
-      <div class="card p-5 fade-up"><div class="num text-3xl md:text-4xl font-bold text-volt">0.335</div><div class="text-zinc-400 text-sm mt-1">spatial-CV R² (model v3, draft 3) — vs 0.007 for demographics alone</div></div>
+      <div class="card p-5 fade-up"><div class="num text-3xl md:text-4xl font-bold text-volt">0.335</div><div class="text-zinc-400 text-sm mt-1">spatial-CV R² (model M3) — vs 0.007 for demographics alone</div></div>
     </div>
   </section>
 
@@ -113,10 +113,10 @@ tailwind.config = { theme: { extend: {
   <section id="results" class="py-14">
     <div class="flex flex-wrap items-end gap-4">
       <div>
-        <h2 class="font-disp text-3xl font-bold fade-up">Results — model v3 (draft 3), DC fast charging</h2>
+        <h2 class="font-disp text-3xl font-bold fade-up">Results — model M3, DC fast charging</h2>
         <p class="text-zinc-400 mt-2 max-w-3xl fade-up">Target: DC fast-charge ports per census tract. Algorithm: a two-stage <strong class="text-zinc-200">hurdle model</strong> — a gradient-boosted classifier for "any DCFC at all" × a gradient-boosted regressor for "how many, given some" (scikit-learn). Validation: 5-fold cross-validation grouped by county, so the model is always scored on counties it has never seen.</p>
       </div>
-      <span class="badge badge-volt ml-auto fade-up">v3 draft 3 · Oct 2026</span>
+      <span class="badge badge-volt ml-auto fade-up">M3 · Oct 2026</span>
     </div>
 
     <div class="grid lg:grid-cols-2 gap-4 mt-8">
@@ -124,16 +124,8 @@ tailwind.config = { theme: { extend: {
         <h3 class="font-semibold">Explained variance (R²), held-out counties</h3>
         <div class="mt-5 space-y-5">
           <div>
-            <div class="flex justify-between text-sm mb-1.5"><span class="text-zinc-300">M3 draft 3 — + OpenStreetMap land use &amp; traffic (AADT)</span><span class="num font-semibold text-volt">0.335</span></div>
+            <div class="flex justify-between text-sm mb-1.5"><span class="text-zinc-300">M3 — hurdle + LODES + AADT + OpenStreetMap land use</span><span class="num font-semibold text-volt">0.335</span></div>
             <div class="bar-track"><div class="bar-fill" data-w="100"></div></div>
-          </div>
-          <div>
-            <div class="flex justify-between text-sm mb-1.5"><span class="text-zinc-400">M3 draft 2 — hurdle + LODES + 6-state registrations</span><span class="num font-semibold text-zinc-300">0.288</span></div>
-            <div class="bar-track"><div class="bar-fill" data-w="86.0"></div></div>
-          </div>
-          <div>
-            <div class="flex justify-between text-sm mb-1.5"><span class="text-zinc-400">M3 draft 1 — hurdle model, derived features</span><span class="num font-semibold text-zinc-400">0.281</span></div>
-            <div class="bar-track"><div class="bar-fill dim" data-w="83.9"></div></div>
           </div>
           <div>
             <div class="flex justify-between text-sm mb-1.5"><span class="text-zinc-400">M2 — single regressor, full v2 features</span><span class="num font-semibold text-zinc-400">0.209</span></div>
@@ -144,7 +136,7 @@ tailwind.config = { theme: { extend: {
             <div class="bar-track"><div class="bar-fill dim" data-w="2.1"></div></div>
           </div>
         </div>
-        <p class="text-zinc-500 text-sm mt-5 leading-relaxed">Two kinds of wins so far. <strong class="text-zinc-300">Architecture:</strong> the hurdle split (draft 1) beat every loss and tuning variant — Poisson loss collapsed at R² −2.2. <strong class="text-zinc-300">Land use:</strong> draft 3's OpenStreetMap points of interest — shops, hotels, fuel stations, parking — were the largest single data gain yet (+0.044), because they capture the commercial geography tract statistics miss. Mean absolute error is down to <strong class="text-zinc-300">1.17 ports per tract</strong> from 1.61 at baseline. POI coverage is currently the Geofabrik us-west + us-south regions (47,846 tracts); extending it nationwide is the top item on the roadmap.</p>
+        <p class="text-zinc-500 text-sm mt-5 leading-relaxed">Two kinds of wins so far. <strong class="text-zinc-300">Architecture:</strong> the hurdle split beat every loss and tuning variant — Poisson loss collapsed at R² −2.2. <strong class="text-zinc-300">Land use:</strong> M3's OpenStreetMap points of interest — shops, hotels, fuel stations, parking — were the largest single data gain yet (+0.044), because they capture the commercial geography tract statistics miss. Mean absolute error is down to <strong class="text-zinc-300">1.17 ports per tract</strong> from 1.61 at baseline. POI coverage is currently the Geofabrik us-west + us-south regions (47,846 tracts); extending it nationwide is the top item on the roadmap.</p>
       </div>
 
       <div class="card p-6 fade-up">
@@ -249,7 +241,7 @@ tailwind.config = { theme: { extend: {
     <h2 class="font-disp text-3xl font-bold fade-up">One project, many model families</h2>
     <p class="text-zinc-400 mt-2 max-w-3xl fade-up">ChargeAhead is a home for a family of placement models, each framed as its own research question with its own validation. New families land here as they mature.</p>
     <div class="grid md:grid-cols-2 gap-4 mt-8">
-      <div class="card p-6 fade-up"><div class="flex items-center gap-3"><h3 class="font-semibold text-lg">Tract Demand — Hurdle GBDT</h3><span class="badge badge-volt">Live · v3 draft 3</span></div>
+      <div class="card p-6 fade-up"><div class="flex items-center gap-3"><h3 class="font-semibold text-lg">Tract Demand — Hurdle GBDT</h3><span class="badge badge-volt">Live · M3</span></div>
         <p class="text-zinc-400 text-sm mt-2 leading-relaxed">The flagship on this page: a two-stage hurdle model (siting classifier × sizing regressor) predicting DC fast-charge ports for all 85,186 U.S. census tracts. Spatial-CV R² 0.335.</p></div>
       <div class="card p-6 fade-up"><div class="flex items-center gap-3"><h3 class="font-semibold text-lg">Greenfield Discovery</h3><span class="badge">In development</span></div>
         <p class="text-zinc-400 text-sm mt-2 leading-relaxed">The same target with supply-context features removed, isolating genuinely underserved demand from network clustering — the honest "where is nobody looking?" model.</p></div>
@@ -292,7 +284,7 @@ tailwind.config = { theme: { extend: {
   <div class="max-w-7xl mx-auto px-5 py-8 flex flex-wrap gap-4 items-center text-sm text-zinc-500">
     <span class="flex items-center gap-2"><span class="inline-flex w-6 h-6 rounded bg-volt text-zinc-950 items-center justify-center"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4.5 13.5H11L9.5 22 19 9.5h-6.5L13 2z"/></svg></span><span class="text-zinc-300 font-semibold">ChargeAhead</span></span>
     <span>Open research on EV charging placement · MIT licensed · Built entirely on public data</span>
-    <span class="ml-auto font-mono text-xs">Model v3 draft 3 · data as of Oct 2026</span>
+    <span class="ml-auto font-mono text-xs">Model M3 · data as of Oct 2026</span>
   </div>
 </footer>
 <div id="tooltip" class="hidden card !rounded-lg px-3 py-2 text-sm text-zinc-200"></div>
@@ -344,14 +336,14 @@ const IMP=[
  ['DC fast ports within 5 km',0.232,'Charging already near this tract (its own ports excluded). Networks expand where they already are — the strongest single signal in every version so far.'],
  ['Distance to nearest DCFC',0.092,'How far the closest existing fast charger is. Proximity predicts more build-out — clustering again.'],
  ['Distance to primary road',0.087,'Kilometres from the tract centre to the nearest Interstate or U.S. highway — corridor access.'],
- ['Retail POIs (OpenStreetMap)',0.075,'Shops in the tract. Draft 3\u2019s headline finding: commercial land use is the signal tract demographics were missing.'],
+ ['Retail POIs (OpenStreetMap)',0.075,'Shops in the tract. M3\u2019s headline finding: commercial land use is the signal tract demographics were missing.'],
  ['Hotels &amp; lodging POIs',0.050,'Tourism=hotel/motel in OpenStreetMap — overnight stops are natural fast-charging hosts.'],
  ['Latitude',0.050,'Raw geography lets the trees carve regional regimes — coastal California obeys different rules than rural Texas.'],
  ['Fuel stations (OSM)',0.042,'Gas stations in the tract — the incumbent refuelling footprint marks proven travel-stop locations.'],
  ['DC fast ports within 10 km',0.041,'The wider supply ring — regional build-out momentum around the tract.'],
  ['Longitude',0.040,'The other half of the regional-regime signal.'],
  ['EVs per 1,000 residents',0.038,'Registration intensity across six states (CA, WA, NY, MD, PA, VA).'],
- ['Population density',0.035,'People per square mile — demoted in draft 3 once real land use is known.'],
+ ['Population density',0.035,'People per square mile — demoted in M3 once real land use is known.'],
  ['Parking POIs (OSM)',0.033,'Mapped parking facilities — cars already dwell here.'],
 ];
 const imp=document.getElementById('importance'),tip=document.getElementById('tooltip');
