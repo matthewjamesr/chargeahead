@@ -1,0 +1,9 @@
+# Raw source downloads are large and reproducible via data/DATA_SOURCES.md
+data/*.jsonl
+data/*.zip
+data/*.dat
+data/*.csv
+data/*.xlsx
+*.log
+__pycache__/
+.venv/
